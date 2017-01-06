@@ -26,6 +26,7 @@
 
 import matplotlib.pyplot as plt
 import primes
+import shapes
 import os
 import numpy as np
 import pickle
@@ -122,42 +123,6 @@ def write_results_to_figure (fig_id, data_id, title_start, file_output):
     fig.suptitle(title, fontsize=10)
     plt.savefig(file_output)
 
-def next_delta (delta_x, delta_y, turn):
-    if turn:
-        if delta_x == 1 and delta_y == 0:
-            delta_x = 0
-            delta_y = 1
-            return (delta_x, delta_y)
-        if delta_x == 0 and delta_y == 1:
-            delta_x = -1
-            delta_y = 0
-            return (delta_x, delta_y)
-        if delta_x == -1 and delta_y == 0:
-            delta_x = 0
-            delta_y = -1
-            return (delta_x, delta_y)
-        if delta_x == 0 and delta_y == -1:
-            delta_x = 1
-            delta_y = 0
-            return (delta_x, delta_y)
-    return (delta_x, delta_y)
-
-def next_turn (p, num, is_previous_prime):
-    turn = False
-    if p.is_prime(num) and not is_previous_prime:
-        turn = True
-        is_previous_prime = True
-    if not p.is_prime(num) and is_previous_prime:
-        turn = True
-        is_previous_prime = False
-    return (turn, is_previous_prime)
-
-def next_sign (sign):
-    if sign == 1:
-        return -1
-    else:
-        return 1
-
 def save_current_results (file_output_pickle):
     global k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, is_previous_prime, sign
     with open(file_output_pickle, 'wb') as f:
@@ -198,8 +163,8 @@ for k in range (min_num, max_num):
         num = k*step_factor + 1
         num_current[0] = num
 
-        (turn, is_previous_prime[0]) = next_turn (p, num, is_previous_prime[0])
-        (delta_x[0], delta_y[0]) = next_delta (delta_x[0], delta_y[0], turn)
+        (turn, is_previous_prime[0]) = shapes.next_turn (p, num, is_previous_prime[0])
+        (delta_x[0], delta_y[0]) = shapes.next_delta (delta_x[0], delta_y[0], turn)
 
         new_x[0]+= delta_x[0]
         new_y[0]+= delta_y[0]
@@ -215,8 +180,8 @@ for k in range (min_num, max_num):
         num = k*3*step_factor + 1
         num_current[1] = num
 
-        (turn, is_previous_prime[1]) = next_turn (p, num, is_previous_prime[1])
-        (delta_x[1], delta_y[1]) = next_delta (delta_x[1], delta_y[1], turn)
+        (turn, is_previous_prime[1]) = shapes.next_turn (p, num, is_previous_prime[1])
+        (delta_x[1], delta_y[1]) = shapes.next_delta (delta_x[1], delta_y[1], turn)
 
         new_x[1]+= delta_x[1]
         new_y[1]+= delta_y[1]
@@ -232,8 +197,8 @@ for k in range (min_num, max_num):
         num = k*3*step_factor - 1
         num_current[2] = num
 
-        (turn, is_previous_prime[2]) = next_turn (p, num, is_previous_prime[2])
-        (delta_x[2], delta_y[2]) = next_delta (delta_x[2], delta_y[2], turn)
+        (turn, is_previous_prime[2]) = shapes.next_turn (p, num, is_previous_prime[2])
+        (delta_x[2], delta_y[2]) = shapes.next_delta (delta_x[2], delta_y[2], turn)
 
         new_x[2]+= delta_x[2]
         new_y[2]+= delta_y[2]
@@ -249,9 +214,9 @@ for k in range (min_num, max_num):
         num = k*3*step_factor - 1*sign
         num_current[3] = num
 
-        (turn, is_previous_prime[3]) = next_turn (p, num, is_previous_prime[3])
-        sign = next_sign (sign)
-        (delta_x[3], delta_y[3]) = next_delta (delta_x[3], delta_y[3], turn)
+        (turn, is_previous_prime[3]) = shapes.next_turn (p, num, is_previous_prime[3])
+        sign = shapes.next_sign (sign)
+        (delta_x[3], delta_y[3]) = shapes.next_delta (delta_x[3], delta_y[3], turn)
 
         new_x[3]+= delta_x[3]
         new_y[3]+= delta_y[3]
@@ -267,8 +232,8 @@ for k in range (min_num, max_num):
         num = k
         num_current[4] = num
 
-        (turn, is_previous_prime[4]) = next_turn (p, num, is_previous_prime[4])
-        (delta_x[4], delta_y[4]) = next_delta (delta_x[4], delta_y[4], turn)
+        (turn, is_previous_prime[4]) = shapes.next_turn (p, num, is_previous_prime[4])
+        (delta_x[4], delta_y[4]) = shapes.next_delta (delta_x[4], delta_y[4], turn)
 
         new_x[4]+= delta_x[4]
         new_y[4]+= delta_y[4]
@@ -280,7 +245,7 @@ for k in range (min_num, max_num):
             colors[4].append(color_no_turn)
 
     # checkpoint - partial results
-    if num % checkpoint_value <= 1:
+    if num % checkpoint_value == 1:
 
         perc_completed = str(int(k * 100 / max_num))
         print ("Checkpoint", k, "of total", max_num, "(" + perc_completed + "% completed)")

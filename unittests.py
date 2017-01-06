@@ -26,6 +26,7 @@
 
 import unittest
 import primes
+import shapes
 
 #############################################################
 # Unit tests
@@ -76,6 +77,27 @@ class TestMethods(unittest.TestCase):
         self.assertEqual(p.get_ith_prime(0), 2)
         self.assertEqual(p.get_ith_prime(1), 3)
         self.assertEqual(p.get_ith_prime(2), 5)
+
+    def test_next_sign(self):
+        self.assertEqual(shapes.next_sign(1), -1)
+        self.assertEqual(shapes.next_sign(-1), 1)
+
+    def test_next_sign_negative(self):
+        self.assertEqual(shapes.next_sign(0), 1)
+        self.assertEqual(shapes.next_sign(-5), 1)
+        self.assertEqual(shapes.next_sign(5), 1)
+
+    def test_next_delta_noturn(self):
+        self.assertEqual(shapes.next_delta (0, 1, False), (0, 1))
+        self.assertEqual(shapes.next_delta (1, 0, False), (1, 0))
+        self.assertEqual(shapes.next_delta (0, -1, False), (0, -1))
+        self.assertEqual(shapes.next_delta (-1, 0, False), (-1, 0))
+
+    def test_next_delta_turn(self):
+        self.assertEqual(shapes.next_delta (0, 1, True), (-1, 0))
+        self.assertEqual(shapes.next_delta (1, 0, True), (0, 1))
+        self.assertEqual(shapes.next_delta (0, -1, True), (1, 0))
+        self.assertEqual(shapes.next_delta (-1, 0, True), (0, -1))
 
 #############################################################
 # Main - run unit tests
