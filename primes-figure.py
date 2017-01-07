@@ -41,11 +41,11 @@ min_num = 1
 step_factor = 2
 # Maximum even number checked against Goldbach conjecture
 #   o number = max_num * step_factor
-max_num = 200000
+max_num = 20000
 
 # Checkpoint value when partial results are drawn/displayed
 # should be greater than zero
-checkpoint_value = 10000
+checkpoint_value = 1000
 
 # Caching previous primality results
 #   o True  - auxilary sets of primes and composite numbers will grow
@@ -55,7 +55,8 @@ checkpoint_value = 10000
 caching_primality_results = False
 
 # Cases to be checked
-cases_to_check = {'c1', 'c2', 'c3', 'c4', 'c5'}
+cases_to_check = {'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8'}
+#cases_to_check = {'c6', 'c7', 'c8'}
 
 # Helper files
 #   o file_input_primes - contains prime numbers
@@ -79,24 +80,27 @@ file_output_shape_2 = directory + "/f_shape_2.png"
 file_output_shape_3 = directory + "/f_shape_3.png"
 file_output_shape_4 = directory + "/f_shape_4.png"
 file_output_shape_5 = directory + "/f_shape_5.png"
+file_output_shape_6 = directory + "/f_shape_6.png"
+file_output_shape_7 = directory + "/f_shape_7.png"
+file_output_shape_8 = directory + "/f_shape_8.png"
 file_output_pickle = directory + "/objs_shape.pickle"
 
 #############################################################
 # Results of calculations
 #############################################################
 
-new_x = [0, 0, 0, 0, 0]
-new_y = [0, 0, 0, 0, 0]
-delta_x = [1, 1, 1, 1, 1]
-delta_y = [0, 0, 0, 0, 0]
-num_current = [0, 0, 0, 0, 0]
+new_x = [0, 0, 0, 0, 0, 0, 0, 0]
+new_y = [0, 0, 0, 0, 0, 0, 0, 0]
+delta_x = [1, 1, 1, 1, 1, 1, 1, 1]
+delta_y = [0, 0, 0, 0, 0, 0, 0, 0]
+num_current = [0, 0, 0, 0, 0, 0, 0, 0]
 
-datax = [[0], [0], [0], [0], [0]]
-datay = [[0], [0], [0], [0], [0]]
-colors = [[0], [0], [0], [0], [0]]
+datax = [[0], [0], [0], [0], [0], [0], [0], [0]]
+datay = [[0], [0], [0], [0], [0], [0], [0], [0]]
+colors = [[0], [0], [0], [0], [0], [0], [0], [0]]
 
-is_previous_prime = [False, False, False, False, False]
-sign = 1
+is_previous_prime = [False, False, False, False, False, False, False, False]
+sign = [1, 1, 1, 1, 1, 1, 1, 1]
 k_current = 0
 
 #############################################################
@@ -114,6 +118,12 @@ def write_results_to_figures():
         write_results_to_figure (4, 3, "n=6k-+1 (k=1,2,3...); n from 5 to ", file_output_shape_4)
     if 'c5' in cases_to_check:
         write_results_to_figure (5, 4, "n=1,2,3... ; n from 1 to ", file_output_shape_5)
+    if 'c6' in cases_to_check:
+        write_results_to_figure (6, 5, "n=30k+1 (k=1,2,3...); n from 4 to ", file_output_shape_6)
+    if 'c7' in cases_to_check:
+        write_results_to_figure (7, 6, "n=30k-1 (k=1,2,3...); n from 2 to ", file_output_shape_7)
+    if 'c8' in cases_to_check:
+        write_results_to_figure (8, 7, "n=30k-+1 (k=1,2,3...); n from 2 to ", file_output_shape_8)
 
 def write_results_to_figure (fig_id, data_id, title_start, file_output):
     area = np.pi * 2
@@ -163,8 +173,7 @@ for k in range (min_num, max_num):
         num = k*step_factor + 1
         num_current[0] = num
 
-        (turn, is_previous_prime[0]) = shapes.next_turn (p, num, is_previous_prime[0])
-        (delta_x[0], delta_y[0]) = shapes.next_delta (delta_x[0], delta_y[0], turn)
+        (delta_x[0], delta_y[0], sign[0], is_previous_prime[0], turn) = shapes.next_iteration (p, num, is_previous_prime[0], delta_x[0], delta_y[0], sign[0])
 
         new_x[0]+= delta_x[0]
         new_y[0]+= delta_y[0]
@@ -180,8 +189,7 @@ for k in range (min_num, max_num):
         num = k*3*step_factor + 1
         num_current[1] = num
 
-        (turn, is_previous_prime[1]) = shapes.next_turn (p, num, is_previous_prime[1])
-        (delta_x[1], delta_y[1]) = shapes.next_delta (delta_x[1], delta_y[1], turn)
+        (delta_x[1], delta_y[1], sign[1], is_previous_prime[1], turn) = shapes.next_iteration (p, num, is_previous_prime[1], delta_x[1], delta_y[1], sign[1])
 
         new_x[1]+= delta_x[1]
         new_y[1]+= delta_y[1]
@@ -197,8 +205,7 @@ for k in range (min_num, max_num):
         num = k*3*step_factor - 1
         num_current[2] = num
 
-        (turn, is_previous_prime[2]) = shapes.next_turn (p, num, is_previous_prime[2])
-        (delta_x[2], delta_y[2]) = shapes.next_delta (delta_x[2], delta_y[2], turn)
+        (delta_x[2], delta_y[2], sign[2], is_previous_prime[2], turn) = shapes.next_iteration (p, num, is_previous_prime[2], delta_x[2], delta_y[2], sign[2])
 
         new_x[2]+= delta_x[2]
         new_y[2]+= delta_y[2]
@@ -211,12 +218,10 @@ for k in range (min_num, max_num):
 
     # case 4:
     if 'c4' in cases_to_check:
-        num = k*3*step_factor - 1*sign
+        num = k*3*step_factor - 1*sign[0]
         num_current[3] = num
 
-        (turn, is_previous_prime[3]) = shapes.next_turn (p, num, is_previous_prime[3])
-        sign = shapes.next_sign (sign)
-        (delta_x[3], delta_y[3]) = shapes.next_delta (delta_x[3], delta_y[3], turn)
+        (delta_x[3], delta_y[3], sign[3], is_previous_prime[3], turn) = shapes.next_iteration (p, num, is_previous_prime[3], delta_x[3], delta_y[3], sign[3])
 
         new_x[3]+= delta_x[3]
         new_y[3]+= delta_y[3]
@@ -232,8 +237,7 @@ for k in range (min_num, max_num):
         num = k
         num_current[4] = num
 
-        (turn, is_previous_prime[4]) = shapes.next_turn (p, num, is_previous_prime[4])
-        (delta_x[4], delta_y[4]) = shapes.next_delta (delta_x[4], delta_y[4], turn)
+        (delta_x[4], delta_y[4], sign[4], is_previous_prime[4], turn) = shapes.next_iteration (p, num, is_previous_prime[4], delta_x[4], delta_y[4], sign[4])
 
         new_x[4]+= delta_x[4]
         new_y[4]+= delta_y[4]
@@ -243,6 +247,54 @@ for k in range (min_num, max_num):
             colors[4].append(color_turn)
         else:
             colors[4].append(color_no_turn)
+
+    # case 6:
+    if 'c6' in cases_to_check:
+        num = k*2*3*5 + 1
+        num_current[5] = num
+
+        (delta_x[5], delta_y[5], sign[5], is_previous_prime[5], turn) = shapes.next_iteration (p, num, is_previous_prime[5], delta_x[5], delta_y[5], sign[5])
+
+        new_x[5]+= delta_x[5]
+        new_y[5]+= delta_y[5]
+        datax[5].append(new_x[5])
+        datay[5].append(new_y[5])
+        if turn:
+            colors[5].append(color_turn)
+        else:
+            colors[5].append(color_no_turn)
+
+    # case 7:
+    if 'c7' in cases_to_check:
+        num = k*2*3*5 - 1
+        num_current[6] = num
+
+        (delta_x[6], delta_y[6], sign[6], is_previous_prime[6], turn) = shapes.next_iteration (p, num, is_previous_prime[6], delta_x[6], delta_y[6], sign[6])
+
+        new_x[6]+= delta_x[6]
+        new_y[6]+= delta_y[6]
+        datax[6].append(new_x[6])
+        datay[6].append(new_y[6])
+        if turn:
+            colors[6].append(color_turn)
+        else:
+            colors[6].append(color_no_turn)
+
+    # case 8:
+    if 'c8' in cases_to_check:
+        num = k*2*3*5 - 1*sign[1]
+        num_current[7] = num
+
+        (delta_x[7], delta_y[7], sign[7], is_previous_prime[7], turn) = shapes.next_iteration (p, num, is_previous_prime[7], delta_x[7], delta_y[7], sign[7])
+        
+        new_x[7]+= delta_x[7]
+        new_y[7]+= delta_y[7]
+        datax[7].append(new_x[7])
+        datay[7].append(new_y[7])
+        if turn:
+            colors[7].append(color_turn)
+        else:
+            colors[7].append(color_no_turn)
 
     # checkpoint - partial results
     if num % checkpoint_value == 1:
