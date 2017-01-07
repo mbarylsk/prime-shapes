@@ -99,6 +99,13 @@ class TestMethods(unittest.TestCase):
         self.assertEqual(shapes.next_delta (0, -1, True), (1, 0))
         self.assertEqual(shapes.next_delta (-1, 0, True), (0, -1))
 
+    def test_get_sum_of_decimal_digits(self):
+        self.assertEqual(shapes.get_sum_of_decimal_digits (1), 1)
+        self.assertEqual(shapes.get_sum_of_decimal_digits (2), 2)
+        self.assertEqual(shapes.get_sum_of_decimal_digits (10), 1)
+        self.assertEqual(shapes.get_sum_of_decimal_digits (29), 11)
+        self.assertEqual(shapes.get_sum_of_decimal_digits (3435343698124), 55)
+
 #############################################################
 # Main - run unit tests
 #############################################################
