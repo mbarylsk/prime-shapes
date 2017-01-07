@@ -35,12 +35,8 @@ import pickle
 # Settings - configuration
 #############################################################
 
-# Minimal even number checked against Goldbach conjecture
-#   o number = min_num * step_factor
+# Minimal and maximum number - range of iterations
 min_num = 1
-step_factor = 2
-# Maximum even number checked against Goldbach conjecture
-#   o number = max_num * step_factor
 max_num = 20000
 
 # Checkpoint value when partial results are drawn/displayed
@@ -72,7 +68,7 @@ color_turn = 50
 # Settings - output directory and files
 #############################################################
 
-directory = str(step_factor*max_num)
+directory = str(max_num)
 if not os.path.exists(directory):
     os.makedirs(directory)
 file_output_shape_1 = directory + "/f_shape_1.png"
@@ -170,7 +166,7 @@ for k in range (min_num, max_num):
 
     # case 1: subsequent odd numbers
     if 'c1' in cases_to_check:
-        num = k*step_factor + 1
+        num = k*2 + 1
         num_current[0] = num
 
         (delta_x[0], delta_y[0], sign[0], is_previous_prime[0], turn) = shapes.next_iteration (p, num, is_previous_prime[0], delta_x[0], delta_y[0], sign[0])
@@ -186,7 +182,7 @@ for k in range (min_num, max_num):
 
     # case 2:
     if 'c2' in cases_to_check:
-        num = k*3*step_factor + 1
+        num = k*2*3 + 1
         num_current[1] = num
 
         (delta_x[1], delta_y[1], sign[1], is_previous_prime[1], turn) = shapes.next_iteration (p, num, is_previous_prime[1], delta_x[1], delta_y[1], sign[1])
@@ -202,7 +198,7 @@ for k in range (min_num, max_num):
 
     # case 3:
     if 'c3' in cases_to_check:
-        num = k*3*step_factor - 1
+        num = k*2*3 - 1
         num_current[2] = num
 
         (delta_x[2], delta_y[2], sign[2], is_previous_prime[2], turn) = shapes.next_iteration (p, num, is_previous_prime[2], delta_x[2], delta_y[2], sign[2])
@@ -218,7 +214,7 @@ for k in range (min_num, max_num):
 
     # case 4:
     if 'c4' in cases_to_check:
-        num = k*3*step_factor - 1*sign[0]
+        num = k*2*3 - 1*sign[3]
         num_current[3] = num
 
         (delta_x[3], delta_y[3], sign[3], is_previous_prime[3], turn) = shapes.next_iteration (p, num, is_previous_prime[3], delta_x[3], delta_y[3], sign[3])
@@ -282,7 +278,7 @@ for k in range (min_num, max_num):
 
     # case 8:
     if 'c8' in cases_to_check:
-        num = k*2*3*5 - 1*sign[1]
+        num = k*2*3*5 - 1*sign[7]
         num_current[7] = num
 
         (delta_x[7], delta_y[7], sign[7], is_previous_prime[7], turn) = shapes.next_iteration (p, num, is_previous_prime[7], delta_x[7], delta_y[7], sign[7])
