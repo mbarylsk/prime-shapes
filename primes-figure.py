@@ -216,8 +216,8 @@ def write_stats_to_file ():
     for i in range (min_case, max_case):
         case = "c" + str(i)
         if case in cases_to_check:
-            perc_primes = int(stats_primes[i-1]*100/stats_iterations[i-1])
-            perc_nonprimes = int(stats_nonprimes[i-1]*100/stats_iterations[i-1])
+            perc_primes = int(stats_primes[i-1]*100/stats_iterations[i-1] + 0.5)
+            perc_nonprimes = int(stats_nonprimes[i-1]*100/stats_iterations[i-1] + 0.5)
             print ("  Figure", i, "statistics:")
             print ("    * Primes     :", stats_primes[i-1], "(", perc_primes, "%)")
             print ("    * Non-primes :", stats_nonprimes[i-1], "(", perc_nonprimes, "%)")
