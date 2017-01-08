@@ -117,36 +117,41 @@ stats_iterations = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 #############################################################
 
 def write_results_to_figures(save_partial_results, perc_completed):
-    global file_output_shape_1, file_output_shape_2, file_output_shape_3, file_output_shape_4, file_output_shape_5, file_output_shape_6, file_output_shape_7, file_output_shape_8, file_output_shape_9
-    if save_partial_results:
-        file_output_shape_1 += "_" + str(perc_completed)
-        file_output_shape_2 += "_" + str(perc_completed)
-        file_output_shape_3 += "_" + str(perc_completed)
-        file_output_shape_4 += "_" + str(perc_completed)
-        file_output_shape_5 += "_" + str(perc_completed)
-        file_output_shape_6 += "_" + str(perc_completed)
-        file_output_shape_7 += "_" + str(perc_completed)
-        file_output_shape_8 += "_" + str(perc_completed)
-        file_output_shape_9 += "_" + str(perc_completed)
+
+    file_shape_1 = set_file_output_filename (file_output_shape_1, save_partial_results, "_" + str(perc_completed))
+    file_shape_2 = set_file_output_filename (file_output_shape_2, save_partial_results, "_" + str(perc_completed))
+    file_shape_3 = set_file_output_filename (file_output_shape_3, save_partial_results, "_" + str(perc_completed))
+    file_shape_4 = set_file_output_filename (file_output_shape_4, save_partial_results, "_" + str(perc_completed))
+    file_shape_5 = set_file_output_filename (file_output_shape_5, save_partial_results, "_" + str(perc_completed))
+    file_shape_6 = set_file_output_filename (file_output_shape_6, save_partial_results, "_" + str(perc_completed))
+    file_shape_7 = set_file_output_filename (file_output_shape_7, save_partial_results, "_" + str(perc_completed))
+    file_shape_8 = set_file_output_filename (file_output_shape_8, save_partial_results, "_" + str(perc_completed))
+    file_shape_9 = set_file_output_filename (file_output_shape_9, save_partial_results, "_" + str(perc_completed))
 
     if 'c1' in cases_to_check:
-        write_results_to_figure (1, 0, "n=2k+1 (k=1,2,3...); n from 3 to ", file_output_shape_1)
+        write_results_to_figure (1, 0, "n=2k+1 (k=1,2,3...); n from 3 to ", file_shape_1)
     if 'c2' in cases_to_check:
-        write_results_to_figure (2, 1, "n=6k+1 (k=1,2,3...); n from 7 to ", file_output_shape_2)
+        write_results_to_figure (2, 1, "n=6k+1 (k=1,2,3...); n from 7 to ", file_shape_2)
     if 'c3' in cases_to_check:
-        write_results_to_figure (3, 2, "n=6k-1 (k=1,2,3...); n from 5 to ", file_output_shape_3)
+        write_results_to_figure (3, 2, "n=6k-1 (k=1,2,3...); n from 5 to ", file_shape_3)
     if 'c4' in cases_to_check:
-        write_results_to_figure (4, 3, "n=6k-+1 (k=1,2,3...); n from 5 to ", file_output_shape_4)
+        write_results_to_figure (4, 3, "n=6k-+1 (k=1,2,3...); n from 5 to ", file_shape_4)
     if 'c5' in cases_to_check:
-        write_results_to_figure (5, 4, "n=1,2,3... ; n from 1 to ", file_output_shape_5)
+        write_results_to_figure (5, 4, "n=1,2,3... ; n from 1 to ", file_shape_5)
     if 'c6' in cases_to_check:
-        write_results_to_figure (6, 5, "n=30k+1 (k=1,2,3...); n from 4 to ", file_output_shape_6)
+        write_results_to_figure (6, 5, "n=30k+1 (k=1,2,3...); n from 4 to ", file_shape_6)
     if 'c7' in cases_to_check:
-        write_results_to_figure (7, 6, "n=30k-1 (k=1,2,3...); n from 2 to ", file_output_shape_7)
+        write_results_to_figure (7, 6, "n=30k-1 (k=1,2,3...); n from 2 to ", file_shape_7)
     if 'c8' in cases_to_check:
-        write_results_to_figure (8, 7, "n=30k-+1 (k=1,2,3...); n from 2 to ", file_output_shape_8)
+        write_results_to_figure (8, 7, "n=30k-+1 (k=1,2,3...); n from 2 to ", file_shape_8)
     if 'c9' in cases_to_check:
-        write_results_to_figure (9, 8, "n=sum of dec digits(k) (k=1,2,3...); n from 2 to ", file_output_shape_9)
+        write_results_to_figure (9, 8, "n=sum of dec digits(k) (k=1,2,3...); n from 2 to ", file_shape_9)
+
+def set_file_output_filename (file_start, add_something, file_end):
+    if add_something:
+        return (file_start + file_end)
+    else:
+        return (file_start)
 
 def write_results_to_figure (fig_id, data_id, title_start, file_output):
     area = np.pi
