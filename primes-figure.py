@@ -37,11 +37,11 @@ import pickle
 
 # Minimal and maximum number - range of iterations
 min_num = 1
-max_num = 20000000
+max_num = 200000
 
 # Checkpoint value when partial results are drawn/displayed
 # should be greater than zero
-checkpoint_value = 100000
+checkpoint_value = 5000
 
 # Caching previous primality results
 #   o True  - auxilary sets of primes and composite numbers will grow
@@ -63,9 +63,12 @@ max_case = 10
 file_input_primes = 't_prime_numbers.txt'
 file_input_nonprimes = 't_nonprime_numbers.txt'
 
+# Save figures with partial results
+figures_save_partial_results = True
+
 # Colors for points
 color_no_turn = 0
-color_turn = 50
+color_turn = 0
 
 #############################################################
 # Settings - output directory and files
@@ -74,15 +77,16 @@ color_turn = 50
 directory = str(max_num)
 if not os.path.exists(directory):
     os.makedirs(directory)
-file_output_shape_1 = directory + "/f_shape_1.png"
-file_output_shape_2 = directory + "/f_shape_2.png"
-file_output_shape_3 = directory + "/f_shape_3.png"
-file_output_shape_4 = directory + "/f_shape_4.png"
-file_output_shape_5 = directory + "/f_shape_5.png"
-file_output_shape_6 = directory + "/f_shape_6.png"
-file_output_shape_7 = directory + "/f_shape_7.png"
-file_output_shape_8 = directory + "/f_shape_8.png"
-file_output_shape_9 = directory + "/f_shape_9.png"
+file_output_shape_1 = directory + "/f_shape_1"
+file_output_shape_2 = directory + "/f_shape_2"
+file_output_shape_3 = directory + "/f_shape_3"
+file_output_shape_4 = directory + "/f_shape_4"
+file_output_shape_5 = directory + "/f_shape_5"
+file_output_shape_6 = directory + "/f_shape_6"
+file_output_shape_7 = directory + "/f_shape_7"
+file_output_shape_8 = directory + "/f_shape_8"
+file_output_shape_9 = directory + "/f_shape_9"
+file_output_extension = ".png"
 file_output_pickle = directory + "/objs_shape.pickle"
 file_output_stats = directory + "/objs_stats.csv"
 
@@ -112,7 +116,19 @@ stats_iterations = [0, 0, 0, 0, 0, 0, 0, 0, 0]
 # Presentation
 #############################################################
 
-def write_results_to_figures():
+def write_results_to_figures(save_partial_results, perc_completed):
+    global file_output_shape_1, file_output_shape_2, file_output_shape_3, file_output_shape_4, file_output_shape_5, file_output_shape_6, file_output_shape_7, file_output_shape_8, file_output_shape_9
+    if save_partial_results:
+        file_output_shape_1 += "_" + str(perc_completed)
+        file_output_shape_2 += "_" + str(perc_completed)
+        file_output_shape_3 += "_" + str(perc_completed)
+        file_output_shape_4 += "_" + str(perc_completed)
+        file_output_shape_5 += "_" + str(perc_completed)
+        file_output_shape_6 += "_" + str(perc_completed)
+        file_output_shape_7 += "_" + str(perc_completed)
+        file_output_shape_8 += "_" + str(perc_completed)
+        file_output_shape_9 += "_" + str(perc_completed)
+
     if 'c1' in cases_to_check:
         write_results_to_figure (1, 0, "n=2k+1 (k=1,2,3...); n from 3 to ", file_output_shape_1)
     if 'c2' in cases_to_check:
@@ -133,23 +149,24 @@ def write_results_to_figures():
         write_results_to_figure (9, 8, "n=sum of dec digits(k) (k=1,2,3...); n from 2 to ", file_output_shape_9)
 
 def write_results_to_figure (fig_id, data_id, title_start, file_output):
-    area = np.pi * 2
+    area = np.pi
     fig = plt.figure(fig_id)
-    plt.scatter(datax[data_id], datay[data_id], s=area, c=colors[data_id], alpha=0.5)
+    plt.scatter(datax[data_id], datay[data_id], s=area, c=colors[data_id], alpha=0.2)
     title = title_start + str(num_current[data_id])
     fig.suptitle(title, fontsize=10)
+    file_output += file_output_extension
     plt.savefig(file_output)
 
 def save_current_results (file_output_pickle):
-    global k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, is_previous_prime, sign
+    global k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations
     with open(file_output_pickle, 'wb') as f:
-        pickle.dump([k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, is_previous_prime, sign], f)
+        pickle.dump([k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations], f)
 
 def restore_previous_results (file_output_pickle):
-    global k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, is_previous_prime, sign
+    global k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations
     if os.path.exists(file_output_pickle):
         with open(file_output_pickle, 'rb') as f:
-           k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, is_previous_prime, sign = pickle.load(f)
+           k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations = pickle.load(f)
 
 def run_test_case (tcid):
     num_current[tcid] = num
@@ -158,12 +175,35 @@ def run_test_case (tcid):
         
     new_x[tcid]+= delta_x[tcid]
     new_y[tcid]+= delta_y[tcid]
-    datax[tcid].append(new_x[tcid])
-    datay[tcid].append(new_y[tcid])
+
+    update_points_optimized (tcid, new_x[tcid], new_y[tcid], turn)
+
+def update_points (tcid, x, y, turn):
+    datax[tcid].append(x)
+    datay[tcid].append(y)
     if turn:
         colors[tcid].append(color_turn)
     else:
         colors[tcid].append(color_no_turn)
+
+def update_points_optimized (tcid, x, y, turn): 
+    old_datax = datax[tcid]
+    old_datay = datay[tcid]
+    i = 0
+    found = False
+    for old_x in old_datax:
+        if old_x == x and old_datay[i] == y:
+            found = True
+            break
+        i += 1
+
+    if not found:
+        datax[tcid].append(x)
+        datay[tcid].append(y)
+        if turn:
+            colors[tcid].append(color_turn)
+        else:
+            colors[tcid].append(color_no_turn)
 
 def write_stats_to_file ():
     f = open(file_output_stats, "a+")
@@ -257,13 +297,13 @@ for k in range (min_num, max_num):
         write_stats_to_file ()
         
         # save results collected so far
-        write_results_to_figures ()
+        write_results_to_figures (figures_save_partial_results, perc_completed)
         k_current = k
         save_current_results(file_output_pickle)
 
 
 # final results
-write_results_to_figures ()
+write_results_to_figures (figures_save_partial_results, perc_completed)
 write_stats_to_file ()
 k_current = max_num
 save_current_results(file_output_pickle)
