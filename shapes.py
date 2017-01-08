@@ -75,8 +75,9 @@ def next_iteration (p, num, is_previous_prime, delta_x, delta_y, sign, stats_pri
     return (delta_x, delta_y, sign, is_previous_prime, turn, stats_primes, stats_nonprimes, stats_iterations)
 
 def get_sum_of_decimal_digits (num):
+    base = 10
     sum_of_digits = 0
     while num:
-        sum_of_digits += num % 10
-        num //= 10
+        sum_of_digits += num % base
+        num //= base
     return sum_of_digits
