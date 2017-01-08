@@ -41,7 +41,7 @@ max_num = 200000
 
 # Checkpoint value when partial results are drawn/displayed
 # should be greater than zero
-checkpoint_value = 5000
+checkpoint_value = 10000
 
 # Caching previous primality results
 #   o True  - auxilary sets of primes and composite numbers will grow
@@ -242,6 +242,7 @@ print ("Restoring previous results...")
 restore_previous_results (file_output_pickle)
 if k_current > 0:
     min_num = k_current
+    k = k_current
     print ("Resuming calculations at", min_num)
 print ("DONE")
 
@@ -308,6 +309,7 @@ for k in range (min_num, max_num):
 
 
 # final results
+perc_completed = str(int(k * 100 / max_num))
 write_results_to_figures (figures_save_partial_results, perc_completed)
 write_stats_to_file ()
 k_current = max_num
