@@ -37,11 +37,11 @@ import pickle
 
 # Minimal and maximum number - range of iterations
 min_num = 1
-max_num = 200000
+max_num = 20000000
 
 # Checkpoint value when partial results are drawn/displayed
 # should be greater than zero
-checkpoint_value = 10000
+checkpoint_value = 1000000
 
 # Caching previous primality results
 #   o True  - auxilary sets of primes and composite numbers will grow
@@ -51,11 +51,11 @@ checkpoint_value = 10000
 caching_primality_results = False
 
 # Cases to be checked
-cases_to_check = {'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9'}
-#cases_to_check = {'c6', 'c7', 'c8', 'c9'}
+#cases_to_check = {'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'c10'}
+cases_to_check = {'c9'}
 
 min_case = 1
-max_case = 10
+max_case = 11
 
 # Helper files
 #   o file_input_primes - contains prime numbers
@@ -86,6 +86,7 @@ file_output_shape_6 = directory + "/f_shape_6"
 file_output_shape_7 = directory + "/f_shape_7"
 file_output_shape_8 = directory + "/f_shape_8"
 file_output_shape_9 = directory + "/f_shape_9"
+file_output_shape_10 = directory + "/f_shape_10"
 file_output_extension = ".png"
 file_output_pickle = directory + "/objs_shape.pickle"
 file_output_stats = directory + "/objs_stats.csv"
@@ -94,27 +95,38 @@ file_output_stats = directory + "/objs_stats.csv"
 # Results of calculations
 #############################################################
 
-new_x =       [0, 0, 0, 0, 0, 0, 0, 0, 0]
-new_y =       [0, 0, 0, 0, 0, 0, 0, 0, 0]
-delta_x =     [1, 1, 1, 1, 1, 1, 1, 1, 1]
-delta_y =     [0, 0, 0, 0, 0, 0, 0, 0, 0]
-num_current = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+new_x =       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+new_y =       [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
+delta_x =     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+delta_y =     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+num_current = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-datax =       [[0], [0], [0], [0], [0], [0], [0], [0], [0]]
-datay =       [[0], [0], [0], [0], [0], [0], [0], [0], [0]]
-colors =      [[0], [0], [0], [0], [0], [0], [0], [0], [0]]
+datax =       [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
+datay =       [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
+colors =      [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
 
-is_previous_prime = [False, False, False, False, False, False, False, False, False]
-sign =        [1, 1, 1, 1, 1, 1, 1, 1, 1]
+is_previous_prime = [False, False, False, False, False, False, False, False, False, False]
+sign =        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 k_current = 0
 
-stats_primes =     [0, 0, 0, 0, 0, 0, 0, 0, 0]
-stats_nonprimes =  [0, 0, 0, 0, 0, 0, 0, 0, 0]
-stats_iterations = [0, 0, 0, 0, 0, 0, 0, 0, 0]
+stats_primes =     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+stats_nonprimes =  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+stats_iterations = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+
+num = 1
 
 #############################################################
 # Presentation
 #############################################################
+
+def get_max_diff (tcid):
+    diff_x = max(datax[tcid]) - min(datax[tcid])
+    diff_y = max(datay[tcid]) - min(datay[tcid])
+    #print (datax[tcid], datay[tcid])
+    return (diff_x + 1, diff_y + 1)
+
+def get_points (tcid):
+    return (len(datax[tcid]))
 
 def write_results_to_figures(save_partial_results, perc_completed):
 
@@ -127,6 +139,7 @@ def write_results_to_figures(save_partial_results, perc_completed):
     file_shape_7 = set_file_output_filename (file_output_shape_7, save_partial_results, "_" + str(perc_completed))
     file_shape_8 = set_file_output_filename (file_output_shape_8, save_partial_results, "_" + str(perc_completed))
     file_shape_9 = set_file_output_filename (file_output_shape_9, save_partial_results, "_" + str(perc_completed))
+    file_shape_10 = set_file_output_filename (file_output_shape_10, save_partial_results, "_" + str(perc_completed))
 
     if 'c1' in cases_to_check:
         write_results_to_figure (1, 0, "n=2k+1 (k=1,2,3...); n from 3 to ", file_shape_1)
@@ -146,6 +159,8 @@ def write_results_to_figures(save_partial_results, perc_completed):
         write_results_to_figure (8, 7, "n=30k-+1 (k=1,2,3...); n from 2 to ", file_shape_8)
     if 'c9' in cases_to_check:
         write_results_to_figure (9, 8, "n=sum of dec digits(k) (k=1,2,3...); n from 2 to ", file_shape_9)
+    if 'c10' in cases_to_check:
+        write_results_to_figure (10, 9, "n=1 or 2", file_shape_10)
 
 def set_file_output_filename (file_start, add_something, file_end):
     if add_something:
@@ -218,9 +233,13 @@ def write_stats_to_file ():
         if case in cases_to_check:
             perc_primes = int(stats_primes[i-1]*100/stats_iterations[i-1] + 0.5)
             perc_nonprimes = int(stats_nonprimes[i-1]*100/stats_iterations[i-1] + 0.5)
+            (diff_x, diff_y) = get_max_diff (i-1)
+            fill = int(get_points (i-1) * 100 / (diff_x * diff_y))
             print ("  Figure", i, "statistics:")
-            print ("    * Primes     :", stats_primes[i-1], "(", perc_primes, "%)")
-            print ("    * Non-primes :", stats_nonprimes[i-1], "(", perc_nonprimes, "%)")
+            print ("    * Primes      :", stats_primes[i-1], "(", perc_primes, "% )")
+            print ("    * Non-primes  :", stats_nonprimes[i-1], "(", perc_nonprimes, "% )")
+            print ("    * Diff (x,y)  :", "(", diff_x, ",", diff_y, ")")
+            print ("    * Figure fill :", fill, "%")
             f.write (case + "," + str(stats_iterations[i-1]) + "," + str(stats_primes[i-1]) + "," + str(perc_primes) + "," + str(stats_nonprimes[i-1]) + "," + str(perc_nonprimes) + "\n")
     f.close ()
 
@@ -293,6 +312,11 @@ for k in range (min_num, max_num):
     if 'c9' in cases_to_check:
         num = shapes.get_sum_of_decimal_digits (k)
         run_test_case (8)
+
+    # case 10: 1 and 2 only
+    if 'c10' in cases_to_check:
+        num = shapes.get_next_num_from_set (num)
+        run_test_case (9)
 
     # checkpoint - partial results
     if (k - min_num) % checkpoint_value == 0:

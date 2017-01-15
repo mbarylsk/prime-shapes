@@ -81,3 +81,9 @@ def get_sum_of_decimal_digits (num):
         sum_of_digits += num % base
         num //= base
     return sum_of_digits
+
+def get_next_num_from_set (num):
+    if num == 2:
+        return 1
+    else:
+        return 2
