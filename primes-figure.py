@@ -37,11 +37,11 @@ import pickle
 
 # Minimal and maximum number - range of iterations
 min_num = 1
-max_num = 20000000
+max_num = 400000
 
 # Checkpoint value when partial results are drawn/displayed
 # should be greater than zero
-checkpoint_value = 1000000
+checkpoint_value = 40000
 
 # Caching previous primality results
 #   o True  - auxilary sets of primes and composite numbers will grow
@@ -52,7 +52,7 @@ caching_primality_results = False
 
 # Cases to be checked
 #cases_to_check = {'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'c10'}
-cases_to_check = {'c9'}
+cases_to_check = {'c1'}
 
 min_case = 1
 max_case = 11
@@ -66,9 +66,15 @@ file_input_nonprimes = 't_nonprime_numbers.txt'
 # Save figures with partial results
 figures_save_partial_results = True
 
+enable_points_lifetime = True
+enable_optimized_points_save = True
+continue_previous_calculations = False
+
 # Colors for points
 color_no_turn = 0
 color_turn = 0
+
+lifetime_start = 10000
 
 #############################################################
 # Settings - output directory and files
@@ -103,6 +109,7 @@ num_current = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 datax =       [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
 datay =       [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
+lifetime =    [[lifetime_start], [lifetime_start], [lifetime_start], [lifetime_start], [lifetime_start], [lifetime_start], [lifetime_start], [lifetime_start], [lifetime_start], [lifetime_start]]
 colors =      [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
 
 is_previous_prime = [False, False, False, False, False, False, False, False, False, False]
@@ -122,7 +129,6 @@ num = 1
 def get_max_diff (tcid):
     diff_x = max(datax[tcid]) - min(datax[tcid])
     diff_y = max(datay[tcid]) - min(datay[tcid])
-    #print (datax[tcid], datay[tcid])
     return (diff_x + 1, diff_y + 1)
 
 def get_points (tcid):
@@ -169,24 +175,29 @@ def set_file_output_filename (file_start, add_something, file_end):
         return (file_start)
 
 def write_results_to_figure (fig_id, data_id, title_start, file_output):
+    global datay, datax, colors
+    #print (datax[data_id], datay[data_id], lifetime[data_id], colors[data_id])
+    
     area = np.pi
     fig = plt.figure(fig_id)
+    plt.clf()
     plt.scatter(datax[data_id], datay[data_id], s=area, c=colors[data_id], alpha=0.2)
     title = title_start + str(num_current[data_id])
     fig.suptitle(title, fontsize=10)
     file_output += file_output_extension
     plt.savefig(file_output)
+    plt.close(fig)
 
 def save_current_results (file_output_pickle):
-    global k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations
+    global k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations
     with open(file_output_pickle, 'wb') as f:
-        pickle.dump([k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations], f)
+        pickle.dump([k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations], f)
 
 def restore_previous_results (file_output_pickle):
-    global k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations
+    global k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations
     if os.path.exists(file_output_pickle):
         with open(file_output_pickle, 'rb') as f:
-           k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations = pickle.load(f)
+           k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations = pickle.load(f)
 
 def run_test_case (tcid):
     num_current[tcid] = num
@@ -196,34 +207,69 @@ def run_test_case (tcid):
     new_x[tcid]+= delta_x[tcid]
     new_y[tcid]+= delta_y[tcid]
 
-    update_points_optimized (tcid, new_x[tcid], new_y[tcid], turn)
+    update_points (tcid, new_x[tcid], new_y[tcid], turn, enable_optimized_points_save, enable_points_lifetime)
 
-def update_points (tcid, x, y, turn):
-    datax[tcid].append(x)
-    datay[tcid].append(y)
-    if turn:
-        colors[tcid].append(color_turn)
-    else:
-        colors[tcid].append(color_no_turn)
-
-def update_points_optimized (tcid, x, y, turn): 
-    old_datax = datax[tcid]
-    old_datay = datay[tcid]
-    i = 0
+def update_points (tcid, x, y, turn, is_optimized, is_lifetime):
+    global datax, datay, lifetime, colors
+    global lifetime_start
     found = False
-    for old_x in old_datax:
-        if old_x == x and old_datay[i] == y:
-            found = True
-            break
-        i += 1
 
+    # if points have lifetime - update it and remove all expiring points
+    if is_lifetime:
+        i = 0
+        indices_to_be_removed = []
+        for l in lifetime[tcid]:
+            if int(l) > 1:
+                lifetime[tcid][i] -= 1
+            # lifetime expired - mark point for removal
+            else:
+                indices_to_be_removed.append(i)
+            i += 1
+
+        # remove marked points
+        for j in indices_to_be_removed:
+            del datax[tcid][j]
+            del datay[tcid][j]
+            del lifetime[tcid][j]
+            del colors[tcid][j]
+
+    # check if point is already on the list
+    if is_optimized:
+        k = 0
+        old_datax = datax[tcid]
+        old_datay = datay[tcid]
+
+        for old_x in old_datax:
+            if old_x == x and old_datay[k] == y:
+                found = True
+                # renew existing point lifetime
+                if is_lifetime:
+                    lifetime[tcid][k] = lifetime_start
+                break
+            k += 1
+
+    # remember point if not found yet
     if not found:
         datax[tcid].append(x)
         datay[tcid].append(y)
+        if is_lifetime:
+            lifetime[tcid].append(lifetime_start)
         if turn:
             colors[tcid].append(color_turn)
         else:
             colors[tcid].append(color_no_turn)
+
+    # internal checks
+    if is_lifetime: 
+        if len(lifetime[tcid]) != len(datax[tcid]):
+            raise ("WrongLengthsOfStructures")
+        for l in lifetime[tcid]:
+            if int(l) < 1:
+                raise ("ExpiredPointOnTheList")
+    if len(datax[tcid]) != len(datay[tcid]):
+        raise ("WrongLengthsOfStructures")
+
+    #print (datax[tcid], datay[tcid], lifetime[tcid])
 
 def write_stats_to_file ():
     f = open(file_output_stats, "a+")
@@ -257,13 +303,14 @@ print ("DONE")
 print ("Sorting primes...")
 p.sort_prime_set()
 print ("DONE")
-print ("Restoring previous results...")
-restore_previous_results (file_output_pickle)
-if k_current > 0:
-    min_num = k_current
-    k = k_current
-    print ("Resuming calculations at", min_num)
-print ("DONE")
+if continue_previous_calculations:
+    print ("Restoring previous results...")
+    restore_previous_results (file_output_pickle)
+    if k_current > 0:
+        min_num = k_current
+        k = k_current
+        print ("Resuming calculations at", min_num)
+    print ("DONE")
 
 # new calculations
 for k in range (min_num, max_num):
