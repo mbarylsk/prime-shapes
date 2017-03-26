@@ -30,6 +30,8 @@ import shapes
 import os
 import numpy as np
 import pickle
+import math
+from random import randint
 
 #############################################################
 # Settings - configuration
@@ -37,11 +39,11 @@ import pickle
 
 # Minimal and maximum number - range of iterations
 min_num = 1
-max_num = 400000
+max_num = 20000
 
 # Checkpoint value when partial results are drawn/displayed
 # should be greater than zero
-checkpoint_value = 40000
+checkpoint_value = 2000
 
 # Caching previous primality results
 #   o True  - auxilary sets of primes and composite numbers will grow
@@ -51,11 +53,11 @@ checkpoint_value = 40000
 caching_primality_results = False
 
 # Cases to be checked
-#cases_to_check = {'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'c10'}
-cases_to_check = {'c1'}
+#cases_to_check = {'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'c10', 'c11', 'c12}
+cases_to_check = {'c12'}
 
 min_case = 1
-max_case = 11
+max_case = 13
 
 # Helper files
 #   o file_input_primes - contains prime numbers
@@ -66,7 +68,7 @@ file_input_nonprimes = 't_nonprime_numbers.txt'
 # Save figures with partial results
 figures_save_partial_results = True
 
-enable_points_lifetime = True
+enable_points_lifetime = False
 enable_optimized_points_save = True
 continue_previous_calculations = False
 
@@ -93,6 +95,8 @@ file_output_shape_7 = directory + "/f_shape_7"
 file_output_shape_8 = directory + "/f_shape_8"
 file_output_shape_9 = directory + "/f_shape_9"
 file_output_shape_10 = directory + "/f_shape_10"
+file_output_shape_11 = directory + "/f_shape_11"
+file_output_shape_12 = directory + "/f_shape_12"
 file_output_extension = ".png"
 file_output_pickle = directory + "/objs_shape.pickle"
 file_output_stats = directory + "/objs_stats.csv"
@@ -101,26 +105,38 @@ file_output_stats = directory + "/objs_stats.csv"
 # Results of calculations
 #############################################################
 
-new_x =       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-new_y =       [0, 0, 0, 0, 0, 0, 0, 0, 0, 1]
-delta_x =     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-delta_y =     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-num_current = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
-datax =       [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
-datay =       [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
-lifetime =    [[lifetime_start], [lifetime_start], [lifetime_start], [lifetime_start], [lifetime_start], [lifetime_start], [lifetime_start], [lifetime_start], [lifetime_start], [lifetime_start]]
-colors =      [[0], [0], [0], [0], [0], [0], [0], [0], [0], [0]]
-
-is_previous_prime = [False, False, False, False, False, False, False, False, False, False]
-sign =        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+new_x = []
+new_y = []
+delta_x = []
+delta_y = []
+num_current = []
+datax = []
+datay = []
+lifetime = []
+colors = []
+is_previous_prime = []
+sign = []
+stats_primes = []
+stats_nonprimes = []
+stats_iterations = []
 k_current = 0
-
-stats_primes =     [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-stats_nonprimes =  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-stats_iterations = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-
 num = 1
+
+for i in range (min_case, max_case):
+    new_x.append(0)
+    new_y.append(0)
+    delta_x.append(1)
+    delta_y.append(0)
+    num_current.append(0)
+    datax.append([])
+    datay.append([])
+    lifetime.append([])
+    colors.append([])
+    is_previous_prime.append(False)
+    sign.append(1)
+    stats_primes.append(0)
+    stats_nonprimes.append(0)
+    stats_iterations.append(0)
 
 #############################################################
 # Presentation
@@ -146,6 +162,8 @@ def write_results_to_figures(save_partial_results, perc_completed):
     file_shape_8 = set_file_output_filename (file_output_shape_8, save_partial_results, "_" + str(perc_completed))
     file_shape_9 = set_file_output_filename (file_output_shape_9, save_partial_results, "_" + str(perc_completed))
     file_shape_10 = set_file_output_filename (file_output_shape_10, save_partial_results, "_" + str(perc_completed))
+    file_shape_11 = set_file_output_filename (file_output_shape_11, save_partial_results, "_" + str(perc_completed))
+    file_shape_12 = set_file_output_filename (file_output_shape_12, save_partial_results, "_" + str(perc_completed))
 
     if 'c1' in cases_to_check:
         write_results_to_figure (1, 0, "n=2k+1 (k=1,2,3...); n from 3 to ", file_shape_1)
@@ -167,6 +185,10 @@ def write_results_to_figures(save_partial_results, perc_completed):
         write_results_to_figure (9, 8, "n=sum of dec digits(k) (k=1,2,3...); n from 2 to ", file_shape_9)
     if 'c10' in cases_to_check:
         write_results_to_figure (10, 9, "n=1 or 2", file_shape_10)
+    if 'c11' in cases_to_check:
+        write_results_to_figure (11, 10, "n = sin(10k) ; k from 1 to ", file_shape_11)
+    if 'c12' in cases_to_check:
+        write_results_to_figure (12, 11, "n = random integer between 2 and 9", file_shape_12)
 
 def set_file_output_filename (file_start, add_something, file_end):
     if add_something:
@@ -175,8 +197,7 @@ def set_file_output_filename (file_start, add_something, file_end):
         return (file_start)
 
 def write_results_to_figure (fig_id, data_id, title_start, file_output):
-    global datay, datax, colors
-    #print (datax[data_id], datay[data_id], lifetime[data_id], colors[data_id])
+    global datax, datay, colors
     
     area = np.pi
     fig = plt.figure(fig_id)
@@ -269,8 +290,6 @@ def update_points (tcid, x, y, turn, is_optimized, is_lifetime):
     if len(datax[tcid]) != len(datay[tcid]):
         raise ("WrongLengthsOfStructures")
 
-    #print (datax[tcid], datay[tcid], lifetime[tcid])
-
 def write_stats_to_file ():
     f = open(file_output_stats, "a+")
 
@@ -320,37 +339,37 @@ for k in range (min_num, max_num):
         num = k*2 + 1
         run_test_case (0)
 
-    # case 2:
+    # case 2: 6k+1
     if 'c2' in cases_to_check:
         num = k*2*3 + 1
         run_test_case (1)
 
-    # case 3:
+    # case 3: 6k-1
     if 'c3' in cases_to_check:
         num = k*2*3 - 1
         run_test_case (2)
 
-    # case 4:
+    # case 4: 6k+-1
     if 'c4' in cases_to_check:
         num = k*2*3 - 1*sign[3]
         run_test_case (3)
 
-    # case 5:
+    # case 5: k
     if 'c5' in cases_to_check:
         num = k
         run_test_case (4)
 
-    # case 6:
+    # case 6: 30k+1
     if 'c6' in cases_to_check:
         num = k*2*3*5 + 1
         run_test_case (5)
 
-    # case 7:
+    # case 7: 30k-1
     if 'c7' in cases_to_check:
         num = k*2*3*5 - 1
         run_test_case (6)
 
-    # case 8:
+    # case 8: 30k+-1
     if 'c8' in cases_to_check:
         num = k*2*3*5 - 1*sign[7]
         run_test_case (7)
@@ -364,6 +383,16 @@ for k in range (min_num, max_num):
     if 'c10' in cases_to_check:
         num = shapes.get_next_num_from_set (num)
         run_test_case (9)
+
+    # case 11: integer(10sin(k))
+    if 'c11' in cases_to_check:
+        num = int(10*math.sin(k))
+        run_test_case (10)
+
+    # case 12: random integer from 2,3,4,5,6,7,8,9 (4 primes, 4 non-primes)
+    if 'c12' in cases_to_check:
+        num = randint(2,9)
+        run_test_case (11)
 
     # checkpoint - partial results
     if (k - min_num) % checkpoint_value == 0:
