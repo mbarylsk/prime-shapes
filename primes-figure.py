@@ -39,11 +39,11 @@ from random import randint
 
 # Minimal and maximum number - range of iterations
 min_num = 1
-max_num = 20000
+max_num = 1000000
 
 # Checkpoint value when partial results are drawn/displayed
 # should be greater than zero
-checkpoint_value = 2000
+checkpoint_value = 10000
 
 # Caching previous primality results
 #   o True  - auxilary sets of primes and composite numbers will grow
@@ -53,8 +53,7 @@ checkpoint_value = 2000
 caching_primality_results = False
 
 # Cases to be checked
-#cases_to_check = {'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'c10', 'c11', 'c12}
-cases_to_check = {'c12'}
+cases_to_check = {'c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8', 'c9', 'c10', 'c11', 'c12'}
 
 min_case = 1
 max_case = 13
