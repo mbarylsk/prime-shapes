@@ -87,17 +87,17 @@ class TestMethods(unittest.TestCase):
         self.assertEqual(shapes.next_sign(-5), 1)
         self.assertEqual(shapes.next_sign(5), 1)
 
-    def test_next_delta_noturn(self):
-        self.assertEqual(shapes.next_delta (0, 1, False), (0, 1))
-        self.assertEqual(shapes.next_delta (1, 0, False), (1, 0))
-        self.assertEqual(shapes.next_delta (0, -1, False), (0, -1))
-        self.assertEqual(shapes.next_delta (-1, 0, False), (-1, 0))
+    def test_next_delta_xy_noturn(self):
+        self.assertEqual(shapes.next_delta_xy (0, 1, False), (0, 1))
+        self.assertEqual(shapes.next_delta_xy (1, 0, False), (1, 0))
+        self.assertEqual(shapes.next_delta_xy (0, -1, False), (0, -1))
+        self.assertEqual(shapes.next_delta_xy (-1, 0, False), (-1, 0))
 
-    def test_next_delta_turn(self):
-        self.assertEqual(shapes.next_delta (0, 1, True), (-1, 0))
-        self.assertEqual(shapes.next_delta (1, 0, True), (0, 1))
-        self.assertEqual(shapes.next_delta (0, -1, True), (1, 0))
-        self.assertEqual(shapes.next_delta (-1, 0, True), (0, -1))
+    def test_next_delta_xy_turn(self):
+        self.assertEqual(shapes.next_delta_xy (0, 1, True), (-1, 0))
+        self.assertEqual(shapes.next_delta_xy (1, 0, True), (0, 1))
+        self.assertEqual(shapes.next_delta_xy (0, -1, True), (1, 0))
+        self.assertEqual(shapes.next_delta_xy (-1, 0, True), (0, -1))
 
     def test_get_sum_of_decimal_digits(self):
         self.assertEqual(shapes.get_sum_of_decimal_digits (1), 1)
