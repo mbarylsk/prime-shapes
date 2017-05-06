@@ -24,14 +24,15 @@
 # OF SUCH DAMAGE.
 #
 
+from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
-import primes
-import shapes
-import os
 import numpy as np
 import pickle
 import math
 from random import randint
+import primes
+import shapes
+import os
 
 #############################################################
 # Settings - configuration
@@ -39,11 +40,11 @@ from random import randint
 
 # Minimal and maximum number - range of iterations
 min_num = 1
-max_num = 1000000
+max_num = 2000000
 
 # Checkpoint value when partial results are drawn/displayed
 # should be greater than zero
-checkpoint_value = 10000
+checkpoint_value = 200000
 
 # Caching previous primality results
 #   o True  - auxilary sets of primes and composite numbers will grow
@@ -70,6 +71,7 @@ figures_save_partial_results = True
 enable_points_lifetime = False
 enable_optimized_points_save = True
 continue_previous_calculations = False
+use_3d_plotting = True
 
 # Colors for points
 color_no_turn = 0
@@ -106,11 +108,14 @@ file_output_stats = directory + "/objs_stats.csv"
 
 new_x = []
 new_y = []
+new_z = []
 delta_x = []
 delta_y = []
+delta_z = []
 num_current = []
 datax = []
 datay = []
+dataz = []
 lifetime = []
 colors = []
 is_previous_prime = []
@@ -124,11 +129,14 @@ num = 1
 for i in range (min_case, max_case):
     new_x.append(0)
     new_y.append(0)
+    new_z.append(0)
     delta_x.append(1)
     delta_y.append(0)
+    delta_z.append(1)
     num_current.append(0)
     datax.append([])
     datay.append([])
+    dataz.append([])
     lifetime.append([])
     colors.append([])
     is_previous_prime.append(False)
@@ -144,50 +152,63 @@ for i in range (min_case, max_case):
 def get_max_diff (tcid):
     diff_x = max(datax[tcid]) - min(datax[tcid])
     diff_y = max(datay[tcid]) - min(datay[tcid])
-    return (diff_x + 1, diff_y + 1)
+    diff_z = max(dataz[tcid]) - min(dataz[tcid])
+    return (diff_x + 1, diff_y + 1, diff_z + 1)
 
 def get_points (tcid):
     return (len(datax[tcid]))
 
-def write_results_to_figures(save_partial_results, perc_completed):
+def write_results_to_figures(save_partial_results, perc_completed, k):
 
-    file_shape_1 = set_file_output_filename (file_output_shape_1, save_partial_results, "_" + str(perc_completed))
-    file_shape_2 = set_file_output_filename (file_output_shape_2, save_partial_results, "_" + str(perc_completed))
-    file_shape_3 = set_file_output_filename (file_output_shape_3, save_partial_results, "_" + str(perc_completed))
-    file_shape_4 = set_file_output_filename (file_output_shape_4, save_partial_results, "_" + str(perc_completed))
-    file_shape_5 = set_file_output_filename (file_output_shape_5, save_partial_results, "_" + str(perc_completed))
-    file_shape_6 = set_file_output_filename (file_output_shape_6, save_partial_results, "_" + str(perc_completed))
-    file_shape_7 = set_file_output_filename (file_output_shape_7, save_partial_results, "_" + str(perc_completed))
-    file_shape_8 = set_file_output_filename (file_output_shape_8, save_partial_results, "_" + str(perc_completed))
-    file_shape_9 = set_file_output_filename (file_output_shape_9, save_partial_results, "_" + str(perc_completed))
-    file_shape_10 = set_file_output_filename (file_output_shape_10, save_partial_results, "_" + str(perc_completed))
-    file_shape_11 = set_file_output_filename (file_output_shape_11, save_partial_results, "_" + str(perc_completed))
-    file_shape_12 = set_file_output_filename (file_output_shape_12, save_partial_results, "_" + str(perc_completed))
+    file_shape_1 = set_file_output_filename (file_output_shape_1, save_partial_results, "_" + str(perc_completed) + str(k))
+    file_shape_2 = set_file_output_filename (file_output_shape_2, save_partial_results, "_" + str(perc_completed) + str(k))
+    file_shape_3 = set_file_output_filename (file_output_shape_3, save_partial_results, "_" + str(perc_completed) + str(k))
+    file_shape_4 = set_file_output_filename (file_output_shape_4, save_partial_results, "_" + str(perc_completed) + str(k))
+    file_shape_5 = set_file_output_filename (file_output_shape_5, save_partial_results, "_" + str(perc_completed) + str(k))
+    file_shape_6 = set_file_output_filename (file_output_shape_6, save_partial_results, "_" + str(perc_completed) + str(k))
+    file_shape_7 = set_file_output_filename (file_output_shape_7, save_partial_results, "_" + str(perc_completed) + str(k))
+    file_shape_8 = set_file_output_filename (file_output_shape_8, save_partial_results, "_" + str(perc_completed) + str(k))
+    file_shape_9 = set_file_output_filename (file_output_shape_9, save_partial_results, "_" + str(perc_completed) + str(k))
+    file_shape_10 = set_file_output_filename (file_output_shape_10, save_partial_results, "_" + str(perc_completed) + str(k))
+    file_shape_11 = set_file_output_filename (file_output_shape_11, save_partial_results, "_" + str(perc_completed) + str(k))
+    file_shape_12 = set_file_output_filename (file_output_shape_12, save_partial_results, "_" + str(perc_completed) + str(k))
 
     if 'c1' in cases_to_check:
-        write_results_to_figure (1, 0, "n=2k+1 (k=1,2,3...); n from 3 to ", file_shape_1)
+        write_results_to_figure (1, 0, "n=2k+1 (k=1,2,3...); n from 3 to ", file_shape_1, False)
+        write_results_to_figure (1, 0, "n=2k+1 (k=1,2,3...); n from 3 to ", file_shape_1 + "3d", True)
     if 'c2' in cases_to_check:
-        write_results_to_figure (2, 1, "n=6k+1 (k=1,2,3...); n from 7 to ", file_shape_2)
+        write_results_to_figure (2, 1, "n=6k+1 (k=1,2,3...); n from 7 to ", file_shape_2, False)
+        write_results_to_figure (2, 1, "n=6k+1 (k=1,2,3...); n from 7 to ", file_shape_2 + "3d", True)
     if 'c3' in cases_to_check:
-        write_results_to_figure (3, 2, "n=6k-1 (k=1,2,3...); n from 5 to ", file_shape_3)
+        write_results_to_figure (3, 2, "n=6k-1 (k=1,2,3...); n from 5 to ", file_shape_3, False)
+        write_results_to_figure (3, 2, "n=6k-1 (k=1,2,3...); n from 5 to ", file_shape_3 + "3d", True)
     if 'c4' in cases_to_check:
-        write_results_to_figure (4, 3, "n=6k-+1 (k=1,2,3...); n from 5 to ", file_shape_4)
+        write_results_to_figure (4, 3, "n=6k-+1 (k=1,2,3...); n from 5 to ", file_shape_4, False)
+        write_results_to_figure (4, 3, "n=6k-+1 (k=1,2,3...); n from 5 to ", file_shape_4 + "3d", True)
     if 'c5' in cases_to_check:
-        write_results_to_figure (5, 4, "n=1,2,3... ; n from 1 to ", file_shape_5)
+        write_results_to_figure (5, 4, "n=1,2,3... ; n from 1 to ", file_shape_5, False)
+        write_results_to_figure (5, 4, "n=1,2,3... ; n from 1 to ", file_shape_5 + "3d", True)
     if 'c6' in cases_to_check:
-        write_results_to_figure (6, 5, "n=30k+1 (k=1,2,3...); n from 4 to ", file_shape_6)
+        write_results_to_figure (6, 5, "n=30k+1 (k=1,2,3...); n from 4 to ", file_shape_6, False)
+        write_results_to_figure (6, 5, "n=30k+1 (k=1,2,3...); n from 4 to ", file_shape_6 + "3d", True)
     if 'c7' in cases_to_check:
-        write_results_to_figure (7, 6, "n=30k-1 (k=1,2,3...); n from 2 to ", file_shape_7)
+        write_results_to_figure (7, 6, "n=30k-1 (k=1,2,3...); n from 2 to ", file_shape_7, False)
+        write_results_to_figure (7, 6, "n=30k-1 (k=1,2,3...); n from 2 to ", file_shape_7 + "3d", True)
     if 'c8' in cases_to_check:
-        write_results_to_figure (8, 7, "n=30k-+1 (k=1,2,3...); n from 2 to ", file_shape_8)
+        write_results_to_figure (8, 7, "n=30k-+1 (k=1,2,3...); n from 2 to ", file_shape_8, False)
+        write_results_to_figure (8, 7, "n=30k-+1 (k=1,2,3...); n from 2 to ", file_shape_8 + "3d", True)
     if 'c9' in cases_to_check:
-        write_results_to_figure (9, 8, "n=sum of dec digits(k) (k=1,2,3...); n from 2 to ", file_shape_9)
+        write_results_to_figure (9, 8, "n=sum of dec digits(k) (k=1,2,3...); n from 2 to ", file_shape_9, False)
+        write_results_to_figure (9, 8, "n=sum of dec digits(k) (k=1,2,3...); n from 2 to ", file_shape_9 + "3d", True)
     if 'c10' in cases_to_check:
-        write_results_to_figure (10, 9, "n=1 or 2", file_shape_10)
+        write_results_to_figure (10, 9, "n=1 or 2", file_shape_10, False)
+        write_results_to_figure (10, 9, "n=1 or 2", file_shape_10 + "3d", True)
     if 'c11' in cases_to_check:
-        write_results_to_figure (11, 10, "n = sin(10k) ; k from 1 to ", file_shape_11)
+        write_results_to_figure (11, 10, "n = sin(10k) ; k from 1 to ", file_shape_11, False)
+        write_results_to_figure (11, 10, "n = sin(10k) ; k from 1 to ", file_shape_11 + "3d", True)
     if 'c12' in cases_to_check:
-        write_results_to_figure (12, 11, "n = random integer between 2 and 9", file_shape_12)
+        write_results_to_figure (12, 11, "n = random integer between 2 and 9", file_shape_12, False)
+        write_results_to_figure (12, 11, "n = random integer between 2 and 9", file_shape_12 + "3d", True)
 
 def set_file_output_filename (file_start, add_something, file_end):
     if add_something:
@@ -195,41 +216,50 @@ def set_file_output_filename (file_start, add_something, file_end):
     else:
         return (file_start)
 
-def write_results_to_figure (fig_id, data_id, title_start, file_output):
-    global datax, datay, colors
-    
-    area = np.pi
-    fig = plt.figure(fig_id)
-    plt.clf()
-    plt.scatter(datax[data_id], datay[data_id], s=area, c=colors[data_id], alpha=0.2)
+def write_results_to_figure (fig_id, data_id, title_start, file_output, if_3d):
+    global datax, datay, dataz, colors
+
     title = title_start + str(num_current[data_id])
-    fig.suptitle(title, fontsize=10)
+
+    if if_3d:
+        fig = plt.figure(fig_id)
+        ax = fig.add_subplot(111, projection='3d')
+        ax.scatter(datax[data_id], datay[data_id], dataz[data_id], c=colors[data_id], marker='o')
+
+    else:
+        area = np.pi
+        fig = plt.figure(fig_id)
+        plt.clf()
+        plt.scatter(datax[data_id], datay[data_id], s=area, c=colors[data_id], alpha=0.2)
+        fig.suptitle(title, fontsize=10)
+
     file_output += file_output_extension
     plt.savefig(file_output)
     plt.close(fig)
 
 def save_current_results (file_output_pickle):
-    global k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations
+    global k_current, new_x, new_y, new_y, delta_x, delta_y, delta_z, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations
     with open(file_output_pickle, 'wb') as f:
-        pickle.dump([k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations], f)
+        pickle.dump([k_current, new_x, new_y, new_z, delta_x, delta_y, delta_z, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations], f)
 
 def restore_previous_results (file_output_pickle):
-    global k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations
+    global k_current, new_x, new_y, new_y, delta_x, delta_y, delta_z, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations
     if os.path.exists(file_output_pickle):
         with open(file_output_pickle, 'rb') as f:
-           k_current, new_x, new_y, delta_x, delta_y, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations = pickle.load(f)
+           k_current, new_x, new_y, new_z, delta_x, delta_y, delta_z, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations = pickle.load(f)
 
 def run_test_case (tcid):
     num_current[tcid] = num
 
-    (delta_x[tcid], delta_y[tcid], sign[tcid], is_previous_prime[tcid], turn, stats_primes[tcid], stats_nonprimes[tcid], stats_iterations[tcid]) = shapes.next_iteration (p, num, is_previous_prime[tcid], delta_x[tcid], delta_y[tcid], sign[tcid], stats_primes[tcid], stats_nonprimes[tcid], stats_iterations[tcid])
+    (delta_x[tcid], delta_y[tcid], delta_z[tcid], sign[tcid], is_previous_prime[tcid], turn, stats_primes[tcid], stats_nonprimes[tcid], stats_iterations[tcid]) = shapes.next_iteration (p, num, is_previous_prime[tcid], delta_x[tcid], delta_y[tcid], delta_z[tcid], sign[tcid], stats_primes[tcid], stats_nonprimes[tcid], stats_iterations[tcid])
         
     new_x[tcid]+= delta_x[tcid]
     new_y[tcid]+= delta_y[tcid]
+    new_z[tcid]+= delta_z[tcid]
 
-    update_points (tcid, new_x[tcid], new_y[tcid], turn, enable_optimized_points_save, enable_points_lifetime)
+    update_points (tcid, new_x[tcid], new_y[tcid], new_z[tcid], turn, enable_optimized_points_save, enable_points_lifetime)
 
-def update_points (tcid, x, y, turn, is_optimized, is_lifetime):
+def update_points (tcid, x, y, z, turn, is_optimized, is_lifetime):
     global datax, datay, lifetime, colors
     global lifetime_start
     found = False
@@ -250,6 +280,7 @@ def update_points (tcid, x, y, turn, is_optimized, is_lifetime):
         for j in indices_to_be_removed:
             del datax[tcid][j]
             del datay[tcid][j]
+            del dataz[tcid][j]
             del lifetime[tcid][j]
             del colors[tcid][j]
 
@@ -258,9 +289,10 @@ def update_points (tcid, x, y, turn, is_optimized, is_lifetime):
         k = 0
         old_datax = datax[tcid]
         old_datay = datay[tcid]
+        old_dataz = dataz[tcid]
 
         for old_x in old_datax:
-            if old_x == x and old_datay[k] == y:
+            if old_x == x and old_datay[k] == y and old_dataz[k] == z:
                 found = True
                 # renew existing point lifetime
                 if is_lifetime:
@@ -272,6 +304,7 @@ def update_points (tcid, x, y, turn, is_optimized, is_lifetime):
     if not found:
         datax[tcid].append(x)
         datay[tcid].append(y)
+        dataz[tcid].append(z)
         if is_lifetime:
             lifetime[tcid].append(lifetime_start)
         if turn:
@@ -297,13 +330,15 @@ def write_stats_to_file ():
         if case in cases_to_check:
             perc_primes = int(stats_primes[i-1]*100/stats_iterations[i-1] + 0.5)
             perc_nonprimes = int(stats_nonprimes[i-1]*100/stats_iterations[i-1] + 0.5)
-            (diff_x, diff_y) = get_max_diff (i-1)
-            fill = int(get_points (i-1) * 100 / (diff_x * diff_y))
+            (diff_x, diff_y, diff_z) = get_max_diff (i-1)
+            fill_2d = int(get_points (i-1) * 100 / (diff_x * diff_y))
+            fill_3d = int(get_points (i-1) * 100 / (diff_x * diff_y * diff_z))
             print ("  Figure", i, "statistics:")
-            print ("    * Primes      :", stats_primes[i-1], "(", perc_primes, "% )")
-            print ("    * Non-primes  :", stats_nonprimes[i-1], "(", perc_nonprimes, "% )")
-            print ("    * Diff (x,y)  :", "(", diff_x, ",", diff_y, ")")
-            print ("    * Figure fill :", fill, "%")
+            print ("    * Primes         :", stats_primes[i-1], "(", perc_primes, "% )")
+            print ("    * Non-primes     :", stats_nonprimes[i-1], "(", perc_nonprimes, "% )")
+            print ("    * Diff (x,y,z)   :", "(", diff_x, ",", diff_y, ",", diff_z, ")")
+            print ("    * 2D Figure fill :", fill_2d, "%")
+            print ("    * 3D Figure fill :", fill_3d, "%")
             f.write (case + "," + str(stats_iterations[i-1]) + "," + str(stats_primes[i-1]) + "," + str(perc_primes) + "," + str(stats_nonprimes[i-1]) + "," + str(perc_nonprimes) + "\n")
     f.close ()
 
@@ -402,14 +437,14 @@ for k in range (min_num, max_num):
         write_stats_to_file ()
         
         # save results collected so far
-        write_results_to_figures (figures_save_partial_results, perc_completed)
+        write_results_to_figures (figures_save_partial_results, perc_completed, k)
         k_current = k
         save_current_results(file_output_pickle)
 
 
 # final results
 perc_completed = str(int(k * 100 / max_num))
-write_results_to_figures (figures_save_partial_results, perc_completed)
+write_results_to_figures (figures_save_partial_results, perc_completed, k)
 write_stats_to_file ()
 k_current = max_num
 save_current_results(file_output_pickle)

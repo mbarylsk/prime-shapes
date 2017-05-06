@@ -26,7 +26,7 @@
 
 import primes
 
-def next_delta (delta_x, delta_y, turn):
+def next_delta_xy (delta_x, delta_y, turn):
     if turn:
         if delta_x == 1 and delta_y == 0:
             delta_x = 0
@@ -46,9 +46,21 @@ def next_delta (delta_x, delta_y, turn):
             return (delta_x, delta_y)
     return (delta_x, delta_y)
 
+def next_delta_z (delta_z, is_previous_prime, is_current_prime):
+    if not is_previous_prime and is_current_prime:
+        if delta_z == 0:
+            delta_z = 1
+        elif delta_z == 1:
+            delta_z = -1
+        else:
+            delta_z = 0
+    return delta_z
+
 def next_turn (p, num, is_previous_prime, stats_primes, stats_nonprimes):
     turn = False
+    is_current_prime = False
     if p.is_prime(num):
+        is_current_prime = True
         stats_primes += 1
         if not is_previous_prime:
             turn = True
@@ -58,7 +70,7 @@ def next_turn (p, num, is_previous_prime, stats_primes, stats_nonprimes):
         if is_previous_prime:
             turn = True
             is_previous_prime = False
-    return (turn, is_previous_prime, stats_primes, stats_nonprimes)
+    return (turn, is_previous_prime, is_current_prime, stats_primes, stats_nonprimes)
 
 def next_sign (sign):
     if sign == 1:
@@ -66,13 +78,14 @@ def next_sign (sign):
     else:
         return 1
 
-def next_iteration (p, num, is_previous_prime, delta_x, delta_y, sign, stats_primes, stats_nonprimes, stats_iterations):
+def next_iteration (p, num, is_previous_prime, delta_x, delta_y, delta_z, sign, stats_primes, stats_nonprimes, stats_iterations):
     turn = False
-    (turn, is_previous_prime, stats_primes, stats_nonprimes) = next_turn (p, num, is_previous_prime, stats_primes, stats_nonprimes)
+    (turn, is_previous_prime, is_current_prime, stats_primes, stats_nonprimes) = next_turn (p, num, is_previous_prime, stats_primes, stats_nonprimes)
     sign = next_sign (sign)
-    (delta_x, delta_y) = next_delta (delta_x, delta_y, turn)
+    (delta_x, delta_y) = next_delta_xy (delta_x, delta_y, turn)
+    delta_z = next_delta_z (delta_z, is_previous_prime, is_current_prime)
     stats_iterations += 1
-    return (delta_x, delta_y, sign, is_previous_prime, turn, stats_primes, stats_nonprimes, stats_iterations)
+    return (delta_x, delta_y, delta_z, sign, is_previous_prime, turn, stats_primes, stats_nonprimes, stats_iterations)
 
 def get_sum_of_decimal_digits (num):
     base = 10
