@@ -25,8 +25,10 @@
 # 
 
 import unittest
-import primes
+import sys
 import shapes
+sys.path.insert(0, '..\\primes\\')
+import primes
 
 #############################################################
 # Unit tests

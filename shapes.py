@@ -24,6 +24,8 @@
 # OF SUCH DAMAGE.
 # 
 
+import sys
+sys.path.insert(0, '..\\primes\\')
 import primes
 
 def next_delta_xy (delta_x, delta_y, turn):

@@ -30,9 +30,11 @@ import numpy as np
 import pickle
 import math
 from random import randint
-import primes
 import shapes
 import os
+import sys
+sys.path.insert(0, '..\\primes\\')
+import primes
 
 #############################################################
 # Settings - configuration
@@ -62,8 +64,8 @@ max_case = 13
 # Helper files
 #   o file_input_primes - contains prime numbers
 #   o file_input_nonprimes - contains composite numbers
-file_input_primes = 't_prime_numbers.txt'
-file_input_nonprimes = 't_nonprime_numbers.txt'
+file_input_primes = '..\\primes\\t_prime_numbers.txt'
+file_input_nonprimes = '..\\primes\\t_nonprime_numbers.txt'
 
 # Save figures with partial results
 figures_save_partial_results = True
@@ -83,7 +85,7 @@ lifetime_start = 10000
 # Settings - output directory and files
 #############################################################
 
-directory = str(max_num)
+directory = "results/" + str(max_num)
 if not os.path.exists(directory):
     os.makedirs(directory)
 file_output_shape_1 = directory + "/f_shape_1"
@@ -159,7 +161,6 @@ def get_points (tcid):
     return (len(datax[tcid]))
 
 def write_results_to_figures(save_partial_results, perc_completed, k):
-
     file_shape_1 = set_file_output_filename (file_output_shape_1, save_partial_results, "_" + str(perc_completed) + str(k))
     file_shape_2 = set_file_output_filename (file_output_shape_2, save_partial_results, "_" + str(perc_completed) + str(k))
     file_shape_3 = set_file_output_filename (file_output_shape_3, save_partial_results, "_" + str(perc_completed) + str(k))
