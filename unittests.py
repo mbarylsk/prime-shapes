@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2016-2017, Marcin Barylski
+# Copyright (c) 2016-2019, Marcin Barylski
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without modification, 
@@ -26,9 +26,9 @@
 
 import unittest
 import sys
-import shapes
 sys.path.insert(0, '..\\primes\\')
 import primes
+import shapes
 
 #############################################################
 # Unit tests
@@ -71,11 +71,11 @@ class TestMethods(unittest.TestCase):
 
     def test_get_ith_prime(self):
         p = primes.Primes(False)
-        p.add_to_prime_set(2)
-        p.add_to_prime_set(3)
-        p.add_to_prime_set(5)
-        p.add_to_prime_set(7)
-        p.sort_prime_set()
+        p.add_to_primes_set(2)
+        p.add_to_primes_set(3)
+        p.add_to_primes_set(5)
+        p.add_to_primes_set(7)
+        p.sort_primes_set()
         self.assertEqual(p.get_ith_prime(0), 2)
         self.assertEqual(p.get_ith_prime(1), 3)
         self.assertEqual(p.get_ith_prime(2), 5)

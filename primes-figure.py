@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2017, Marcin Barylski
+# Copyright (c) 2017-2019, Marcin Barylski
 # All rights reserved.
 
 # Redistribution and use in source and binary forms, with or without modification, 
@@ -355,7 +355,7 @@ p.init_set(file_input_primes, True)
 p.init_set(file_input_nonprimes, False)
 print ("DONE")
 print ("Sorting primes...")
-p.sort_prime_set()
+p.sort_primes_set()
 print ("DONE")
 if continue_previous_calculations:
     print ("Restoring previous results...")
