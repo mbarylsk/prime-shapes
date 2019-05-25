@@ -42,11 +42,11 @@ import primes
 
 # Minimal and maximum number - range of iterations
 min_num = 1
-max_num = 2000000
+max_num = 200000
 
 # Checkpoint value when partial results are drawn/displayed
 # should be greater than zero
-checkpoint_value = 200000
+checkpoint_value = 200
 
 # Caching previous primality results
 #   o True  - auxilary sets of primes and composite numbers will grow
@@ -68,7 +68,7 @@ file_input_primes = '..\\primes\\t_prime_numbers.txt'
 file_input_nonprimes = '..\\primes\\t_nonprime_numbers.txt'
 
 # Save figures with partial results
-figures_save_partial_results = True
+figures_save_partial_results = False
 
 enable_points_lifetime = False
 enable_optimized_points_save = True
@@ -249,10 +249,10 @@ def restore_previous_results (file_output_pickle):
         with open(file_output_pickle, 'rb') as f:
            k_current, new_x, new_y, new_z, delta_x, delta_y, delta_z, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations = pickle.load(f)
 
-def run_test_case (tcid):
+def run_test_case (tcid, s):
     num_current[tcid] = num
 
-    (delta_x[tcid], delta_y[tcid], delta_z[tcid], sign[tcid], is_previous_prime[tcid], turn, stats_primes[tcid], stats_nonprimes[tcid], stats_iterations[tcid]) = shapes.next_iteration (p, num, is_previous_prime[tcid], delta_x[tcid], delta_y[tcid], delta_z[tcid], sign[tcid], stats_primes[tcid], stats_nonprimes[tcid], stats_iterations[tcid])
+    (delta_x[tcid], delta_y[tcid], delta_z[tcid], sign[tcid], is_previous_prime[tcid], turn, stats_primes[tcid], stats_nonprimes[tcid], stats_iterations[tcid]) = s.next_iteration (p, num, is_previous_prime[tcid], delta_x[tcid], delta_y[tcid], delta_z[tcid], sign[tcid], stats_primes[tcid], stats_nonprimes[tcid], stats_iterations[tcid])
         
     new_x[tcid]+= delta_x[tcid]
     new_y[tcid]+= delta_y[tcid]
@@ -349,6 +349,7 @@ def write_stats_to_file ():
 
 print ("Initialize objects...")
 p = primes.Primes(caching_primality_results)
+s = shapes.Shape()
 print ("DONE")
 print ("Loading helper sets...")
 p.init_set(file_input_primes, True)
@@ -372,62 +373,62 @@ for k in range (min_num, max_num):
     # case 1: subsequent odd numbers
     if 'c1' in cases_to_check:
         num = k*2 + 1
-        run_test_case (0)
+        run_test_case (0, s)
 
     # case 2: 6k+1
     if 'c2' in cases_to_check:
         num = k*2*3 + 1
-        run_test_case (1)
+        run_test_case (1, s)
 
     # case 3: 6k-1
     if 'c3' in cases_to_check:
         num = k*2*3 - 1
-        run_test_case (2)
+        run_test_case (2, s)
 
     # case 4: 6k+-1
     if 'c4' in cases_to_check:
         num = k*2*3 - 1*sign[3]
-        run_test_case (3)
+        run_test_case (3, s)
 
     # case 5: k
     if 'c5' in cases_to_check:
         num = k
-        run_test_case (4)
+        run_test_case (4, s)
 
     # case 6: 30k+1
     if 'c6' in cases_to_check:
         num = k*2*3*5 + 1
-        run_test_case (5)
+        run_test_case (5, s)
 
     # case 7: 30k-1
     if 'c7' in cases_to_check:
         num = k*2*3*5 - 1
-        run_test_case (6)
+        run_test_case (6, s)
 
     # case 8: 30k+-1
     if 'c8' in cases_to_check:
         num = k*2*3*5 - 1*sign[7]
-        run_test_case (7)
+        run_test_case (7, s)
 
     # case 9: sum of decimal digits is prime or not
     if 'c9' in cases_to_check:
-        num = shapes.get_sum_of_decimal_digits (k)
-        run_test_case (8)
+        num = s.get_sum_of_decimal_digits (k)
+        run_test_case (8, s)
 
     # case 10: 1 and 2 only
     if 'c10' in cases_to_check:
-        num = shapes.get_next_num_from_set (num)
-        run_test_case (9)
+        num = s.get_next_num_from_set (num)
+        run_test_case (9, s)
 
     # case 11: integer(10sin(k))
     if 'c11' in cases_to_check:
         num = int(10*math.sin(k))
-        run_test_case (10)
+        run_test_case (10, s)
 
     # case 12: random integer from 2,3,4,5,6,7,8,9 (4 primes, 4 non-primes)
     if 'c12' in cases_to_check:
         num = randint(2,9)
-        run_test_case (11)
+        run_test_case (11, s)
 
     # checkpoint - partial results
     if (k - min_num) % checkpoint_value == 0:
