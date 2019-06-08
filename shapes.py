@@ -90,17 +90,3 @@ class Shape:
         delta_z = self.next_delta_z (delta_z, is_previous_prime, is_current_prime)
         stats_iterations += 1
         return (delta_x, delta_y, delta_z, sign, is_previous_prime, turn, stats_primes, stats_nonprimes, stats_iterations)
-
-    def get_sum_of_decimal_digits (self, num):
-        base = 10
-        sum_of_digits = 0
-        while num:
-            sum_of_digits += num % base
-            num //= base
-        return sum_of_digits
-
-    def get_next_num_from_set (self, num):
-        if num == 2:
-            return 1
-        else:
-            return 2

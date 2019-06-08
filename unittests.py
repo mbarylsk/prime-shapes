@@ -29,6 +29,7 @@ import sys
 sys.path.insert(0, '..\\primes\\')
 import primes
 import shapes
+import dataprocessing
 
 #############################################################
 # Unit tests
@@ -80,33 +81,38 @@ class TestMethods(unittest.TestCase):
         self.assertEqual(p.get_ith_prime(1), 3)
         self.assertEqual(p.get_ith_prime(2), 5)
 
-    def test_next_sign(self):
-        self.assertEqual(shapes.next_sign(1), -1)
-        self.assertEqual(shapes.next_sign(-1), 1)
-
-    def test_next_sign_negative(self):
-        self.assertEqual(shapes.next_sign(0), 1)
-        self.assertEqual(shapes.next_sign(-5), 1)
-        self.assertEqual(shapes.next_sign(5), 1)
-
     def test_next_delta_xy_noturn(self):
-        self.assertEqual(shapes.next_delta_xy (0, 1, False), (0, 1))
-        self.assertEqual(shapes.next_delta_xy (1, 0, False), (1, 0))
-        self.assertEqual(shapes.next_delta_xy (0, -1, False), (0, -1))
-        self.assertEqual(shapes.next_delta_xy (-1, 0, False), (-1, 0))
+        s = shapes.Shape()
+        self.assertEqual(s.next_delta_xy (0, 1, False), (0, 1))
+        self.assertEqual(s.next_delta_xy (1, 0, False), (1, 0))
+        self.assertEqual(s.next_delta_xy (0, -1, False), (0, -1))
+        self.assertEqual(s.next_delta_xy (-1, 0, False), (-1, 0))
 
     def test_next_delta_xy_turn(self):
-        self.assertEqual(shapes.next_delta_xy (0, 1, True), (-1, 0))
-        self.assertEqual(shapes.next_delta_xy (1, 0, True), (0, 1))
-        self.assertEqual(shapes.next_delta_xy (0, -1, True), (1, 0))
-        self.assertEqual(shapes.next_delta_xy (-1, 0, True), (0, -1))
+        s = shapes.Shape()
+        self.assertEqual(s.next_delta_xy (0, 1, True), (-1, 0))
+        self.assertEqual(s.next_delta_xy (1, 0, True), (0, 1))
+        self.assertEqual(s.next_delta_xy (0, -1, True), (1, 0))
+        self.assertEqual(s.next_delta_xy (-1, 0, True), (0, -1))
+
+    def test_next_sign(self):
+        s = shapes.Shape()
+        self.assertEqual(s.next_sign(1), -1)
+        self.assertEqual(s.next_sign(-1), 1)
+
+    def test_next_sign_negative(self):
+        s = shapes.Shape()
+        self.assertEqual(s.next_sign(0), 1)
+        self.assertEqual(s.next_sign(-5), 1)
+        self.assertEqual(s.next_sign(5), 1)
 
     def test_get_sum_of_decimal_digits(self):
-        self.assertEqual(shapes.get_sum_of_decimal_digits (1), 1)
-        self.assertEqual(shapes.get_sum_of_decimal_digits (2), 2)
-        self.assertEqual(shapes.get_sum_of_decimal_digits (10), 1)
-        self.assertEqual(shapes.get_sum_of_decimal_digits (29), 11)
-        self.assertEqual(shapes.get_sum_of_decimal_digits (3435343698124), 55)
+        dp = dataprocessing.DataProcessing()
+        self.assertEqual(dp.get_sum_of_decimal_digits (1), 1)
+        self.assertEqual(dp.get_sum_of_decimal_digits (2), 2)
+        self.assertEqual(dp.get_sum_of_decimal_digits (10), 1)
+        self.assertEqual(dp.get_sum_of_decimal_digits (29), 11)
+        self.assertEqual(dp.get_sum_of_decimal_digits (3435343698124), 55)
 
 #############################################################
 # Main - run unit tests

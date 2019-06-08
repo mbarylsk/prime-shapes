@@ -31,6 +31,7 @@ import pickle
 import math
 from random import randint
 import shapes
+import dataprocessing
 import os
 import sys
 sys.path.insert(0, '..\\primes\\')
@@ -42,11 +43,11 @@ import primes
 
 # Minimal and maximum number - range of iterations
 min_num = 1
-max_num = 200000
+max_num = 1000000
 
 # Checkpoint value when partial results are drawn/displayed
 # should be greater than zero
-checkpoint_value = 200
+checkpoint_value = 5000
 
 # Caching previous primality results
 #   o True  - auxilary sets of primes and composite numbers will grow
@@ -72,7 +73,7 @@ figures_save_partial_results = False
 
 enable_points_lifetime = False
 enable_optimized_points_save = True
-continue_previous_calculations = False
+continue_previous_calculations = True
 use_3d_plotting = True
 
 # Colors for points
@@ -125,6 +126,7 @@ sign = []
 stats_primes = []
 stats_nonprimes = []
 stats_iterations = []
+k = 0
 k_current = 0
 num = 1
 
@@ -220,7 +222,7 @@ def set_file_output_filename (file_start, add_something, file_end):
 def write_results_to_figure (fig_id, data_id, title_start, file_output, if_3d):
     global datax, datay, dataz, colors
 
-    title = title_start + str(num_current[data_id])
+    title = title_start + str(num_current[data_id]) + " iter=" + str(k) 
 
     if if_3d:
         fig = plt.figure(fig_id)
@@ -239,15 +241,15 @@ def write_results_to_figure (fig_id, data_id, title_start, file_output, if_3d):
     plt.close(fig)
 
 def save_current_results (file_output_pickle):
-    global k_current, new_x, new_y, new_y, delta_x, delta_y, delta_z, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations
+    global k_current, new_x, new_y, new_y, delta_x, delta_y, delta_z, num_current, datax, datay, dataz, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations
     with open(file_output_pickle, 'wb') as f:
-        pickle.dump([k_current, new_x, new_y, new_z, delta_x, delta_y, delta_z, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations], f)
+        pickle.dump([k_current, new_x, new_y, new_z, delta_x, delta_y, delta_z, num_current, datax, datay, dataz, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations], f)
 
 def restore_previous_results (file_output_pickle):
-    global k_current, new_x, new_y, new_y, delta_x, delta_y, delta_z, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations
+    global k_current, new_x, new_y, new_y, delta_x, delta_y, delta_z, num_current, datax, datay, dataz, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations
     if os.path.exists(file_output_pickle):
         with open(file_output_pickle, 'rb') as f:
-           k_current, new_x, new_y, new_z, delta_x, delta_y, delta_z, num_current, datax, datay, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations = pickle.load(f)
+           k_current, new_x, new_y, new_z, delta_x, delta_y, delta_z, num_current, datax, datay, dataz, colors, lifetime, is_previous_prime, sign, stats_primes, stats_nonprimes, stats_iterations = pickle.load(f)
 
 def run_test_case (tcid, s):
     num_current[tcid] = num
@@ -350,6 +352,7 @@ def write_stats_to_file ():
 print ("Initialize objects...")
 p = primes.Primes(caching_primality_results)
 s = shapes.Shape()
+dp = dataprocessing.DataProcessing()
 print ("DONE")
 print ("Loading helper sets...")
 p.init_set(file_input_primes, True)
@@ -412,12 +415,12 @@ for k in range (min_num, max_num):
 
     # case 9: sum of decimal digits is prime or not
     if 'c9' in cases_to_check:
-        num = s.get_sum_of_decimal_digits (k)
+        num = dp.get_sum_of_decimal_digits (k)
         run_test_case (8, s)
 
     # case 10: 1 and 2 only
     if 'c10' in cases_to_check:
-        num = s.get_next_num_from_set (num)
+        num = dp.get_next_num_from_set (num)
         run_test_case (9, s)
 
     # case 11: integer(10sin(k))
